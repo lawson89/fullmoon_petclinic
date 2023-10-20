@@ -1,0 +1,5 @@
+
+{% function block.content() %}
+Hello!
+{% end %}
+{% render('layout') %}

@@ -2,3 +2,4 @@
 
 -- Uncomment this to launch a browser on start
 --LaunchBrowser("/")
+require "petclinic"

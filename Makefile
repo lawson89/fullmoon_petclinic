@@ -65,7 +65,7 @@ ls: ${UNZIP}
 log: ${PROJECT}.log
 	tail -f ${PROJECT}.log
 
-start: ${REDBEAN}
+start: add ${REDBEAN}
 	./${REDBEAN} -vv
 
 start-daemon: ${REDBEAN}
@@ -77,7 +77,7 @@ start-daemon: ${REDBEAN}
 restart-daemon:
 	@(test ! -f ${PROJECT}.pid && \
 		./${REDBEAN} -vv -d -L ${PROJECT}.log -P ${PROJECT}.pid && \
-		printf "started $$(cat ${PROJECT}.pid)") \
+		printf "started $$(cat ${PROmake JECT}.pid)") \
 		|| kill -HUP $$(cat ${PROJECT}.pid) && \
 		printf "restarted $$(cat ${PROJECT}.pid)\n"
 
