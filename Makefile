@@ -56,7 +56,7 @@ ${DEFINITIONS}:
 
 add: ${ZIP} ${REDBEAN}
 	cp -f ${REDBEAN}.template ${REDBEAN}
-	cd srv/ && ../${ZIP} -r ../${REDBEAN} `ls -A`
+	cd srv/ && ../${ZIP} -r -n woff ../${REDBEAN} `ls -A`
 
 ls: ${UNZIP}
 	@./${UNZIP} -vl ./${REDBEAN} | grep -v \
@@ -77,7 +77,7 @@ start-daemon: ${REDBEAN}
 restart-daemon:
 	@(test ! -f ${PROJECT}.pid && \
 		./${REDBEAN} -vv -d -L ${PROJECT}.log -P ${PROJECT}.pid && \
-		printf "started $$(cat ${PROmake JECT}.pid)") \
+		printf "started $$(cat ${PROJECT}.pid)") \
 		|| kill -HUP $$(cat ${PROJECT}.pid) && \
 		printf "restarted $$(cat ${PROJECT}.pid)\n"
 
