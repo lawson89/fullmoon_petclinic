@@ -11,4 +11,4 @@ fm.setRoute("/*", "/assets/*")
 fm.setRoute(fm.GET "/", fm.serveContent("welcome", { name = 'rick' }))
 
 -- start the app
-fm.run()
+fm.run({port = 8000})
