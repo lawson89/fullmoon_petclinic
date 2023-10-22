@@ -8,7 +8,7 @@ fm.setTemplate({ "/templates/", fmt = "fmt" })
 fm.setRoute("/*", "/assets/*")
 
 -- set routes and handlers
-fm.setRoute(fm.GET "/", fm.serveContent("index", { name = 'rick' }))
+fm.setRoute(fm.GET "/", fm.serveContent("welcome", { name = 'rick' }))
 
 -- start the app
 fm.run()
