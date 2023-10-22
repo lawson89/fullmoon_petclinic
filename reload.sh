@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# credit to https://www.baeldung.com/linux/monitor-changes-directory-tree
+
 # we assume running in current folder
 DIRECTORY="./srv"
 
