@@ -1,5 +1,5 @@
--- https://redbean.dev/#usage
+pc = require "petclinic"
 
--- Uncomment this to launch a browser on start
---LaunchBrowser("/")
-require "petclinic"
+pc.initDb()
+pc.run(8000)
+
