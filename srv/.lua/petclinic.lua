@@ -5,20 +5,41 @@ local fm = require "fullmoon"
 -- set template folder and extensions
 fm.setTemplate({ "/templates/", fmt = "fmt" })
 
+local pc = {}
+
+-- set routes and handlers
+local function welcome(r)
+    return fm.serveContent("welcome", { name = 'rick' })
+end
+
+local function show_find_owners(r)
+    return fm.serveContent("owners/findOwners", {})
+end
+
+local function find_owners(r)
+    local result = assert(pc.dbm:fetchAll([[
+        SELECT *
+        FROM owners
+        where last_name LIKE ? order by last_name]],"%"))
+
+    fm.logInfo(string.format("Rows: %s", #result))
+
+    -- the resulting rows are key-value pair with the column as the key
+     return fm.serveContent("owners/ownersList", {owners = result})
+end
+
+fm.setRoute(fm.GET "/owners/find", show_find_owners)
+fm.setRoute(fm.POST "/owners/find", find_owners)
+fm.setRoute(fm.GET "/", welcome)
+
 -- set static assets
 fm.setRoute("/*", "/assets/*")
 
--- set routes and handlers
-fm.setRoute(fm.GET "/", fm.serveContent("welcome", { name = 'rick' }))
-
-local function run(port)
+function pc.run(port)
     -- start the app
     fm.run({ port = port or 8000 })
 end
 
-local pc = {
-    run = run
-}
 
 -- split("a,b,c", ",") => {"a", "b", "c"}
 local function split(s, sep)
@@ -66,15 +87,14 @@ local function runSqlInFile(fname, dbm)
 end
 
 local DBNAME = 'fullmoon_petclinic.db'
-local function initDb()
+function pc:initDb()
     fm.logInfo("Initializing database")
     fm.logInfo("Loading schema sql")
     local dbm = fm.makeStorage(DBNAME)
     runSqlInFile("./db/schema.sql", dbm)
     fm.logInfo("Loading data sql")
     runSqlInFile("./db/data.sql", dbm)
-    pc.dbm = dbm
+    self.dbm = dbm
 end
 
-pc.initDb = initDb
 return pc

@@ -14,11 +14,13 @@ on_change() {
 file_removed() {
     TIMESTAMP=$(date)
     echo "[$TIMESTAMP]: The file $1$2 was removed"
+    on_change
 }
 
 file_modified() {
     TIMESTAMP=$(date)
     echo "[$TIMESTAMP]: The file $1$2 was modified"
+    on_change
 }
 
 file_created() {
