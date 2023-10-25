@@ -1,7 +1,7 @@
 {% function block.content() %}
 <h2>Find Owners</h2>
 
-  <form action="/owners/find" method="post"
+  <form action="/owners/find" method="get"
     class="form-horizontal" id="search-owner-form">
     <div class="form-group">
       <div class="control-group" id="lastNameGroup">

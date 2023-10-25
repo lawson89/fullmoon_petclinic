@@ -12,24 +12,23 @@ local function welcome(r)
     return fm.serveContent("welcome", { name = 'rick' })
 end
 
-local function show_find_owners(r)
-    return fm.serveContent("owners/findOwners", {})
-end
-
 local function find_owners(r)
-    local result = assert(pc.dbm:fetchAll([[
-        SELECT *
-        FROM owners
-        where last_name LIKE ? order by last_name]],"%"))
+    if r.params.lastName then
+        local result = assert(pc.dbm:fetchAll([[
+            SELECT *
+            FROM owners
+            where last_name LIKE ? order by last_name]],r.params.lastName.."%"))
 
-    fm.logInfo(string.format("Rows: %s", #result))
+        fm.logInfo(string.format("Rows: %s", #result))
 
-    -- the resulting rows are key-value pair with the column as the key
-     return fm.serveContent("owners/ownersList", {owners = result})
+        -- the resulting rows are key-value pair with the column as the key
+        return fm.serveContent("owners/ownersList", {owners = result})
+     else
+       return fm.serveContent("owners/findOwners", {})
+     end
 end
 
-fm.setRoute(fm.GET "/owners/find", show_find_owners)
-fm.setRoute(fm.POST "/owners/find", find_owners)
+fm.setRoute(fm.GET "/owners/find", find_owners)
 fm.setRoute(fm.GET "/", welcome)
 
 -- set static assets
