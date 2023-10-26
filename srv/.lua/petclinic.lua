@@ -7,6 +7,21 @@ fm.setTemplate({ "/templates/", fmt = "fmt" })
 
 local pc = {}
 
+-- utility functions
+function dump(o)
+   if type(o) == 'table' then
+      local s = '{ '
+      for k,v in pairs(o) do
+         if type(k) ~= 'number' then k = '"'..k..'"' end
+         s = s .. '['..k..'] = ' .. dump(v) .. ','
+      end
+      return s .. '} '
+   else
+      return tostring(o)
+   end
+end
+
+
 -- set routes and handlers
 local function welcome(r)
     return fm.serveContent("welcome", { name = 'rick' })
@@ -29,7 +44,9 @@ local function find_owners(r)
 end
 
 local new_owner_validator = fm.makeValidator({
-        {"firstName", minlen=5, maxlen=64, msg = "Invalid %s format"}
+        {"firstName", minlen=5, maxlen=64, msg = "Invalid %s format"},
+        all = true,
+        key = true
     })
 
 local function new_owner(r)
@@ -37,10 +54,10 @@ local function new_owner(r)
     if r.method == 'GET' then
         return fm.serveContent("owners/createOrUpdateOwnerForm", {})
     else
-        fm.logInfo(string.format("%s", r.params))
+        fm.logInfo(string.format("%s", dump(r.params)))
         local valid, error = new_owner_validator(r.params)
         fm.logInfo(string.format("%s", valid))
-        fm.logInfo(string.format("%s", error))
+        fm.logInfo(string.format("%s", dump(error)))
         if valid then
             assert(pc.dbm:execute("insert into owners (first_name, last_name, address, city, telephone) values (?, ?, ?, ?, ?)",
                 r.params.firstName, r.params.lastName, r.params.address, r.params.city, r.params.telephone))
