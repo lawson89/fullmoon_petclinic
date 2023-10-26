@@ -28,12 +28,24 @@ local function find_owners(r)
      end
 end
 
+local new_owner_validator = fm.makeValidator({
+        {"firstName", minlen=5, maxlen=64, msg = "Invalid %s format"}
+    })
+
 local function new_owner(r)
     fm.logInfo(r.method)
     if r.method == 'GET' then
         return fm.serveContent("owners/createOrUpdateOwnerForm", {})
     else
-        --todo
+        fm.logInfo(string.format("%s", r.params))
+        local valid, error = new_owner_validator(r.params)
+        fm.logInfo(string.format("%s", valid))
+        fm.logInfo(string.format("%s", error))
+        if valid then
+            assert(pc.dbm:execute("insert into owners (first_name, last_name, address, city, telephone) values (?, ?, ?, ?, ?)",
+                r.params.firstName, r.params.lastName, r.params.address, r.params.city, r.params.telephone))
+            return fm.serveRedirect("owners/find")   
+        end
         return fm.serveContent("owners/createOrUpdateOwnerForm", {})
     end
 end
