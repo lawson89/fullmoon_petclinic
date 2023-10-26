@@ -28,6 +28,17 @@ local function find_owners(r)
      end
 end
 
+local function new_owner(r)
+    fm.logInfo(r.method)
+    if r.method == 'GET' then
+        return fm.serveContent("owners/createOrUpdateOwnerForm", {})
+    else
+        --todo
+        return fm.serveContent("owners/createOrUpdateOwnerForm", {})
+    end
+end
+
+fm.setRoute("/owners/new", new_owner)
 fm.setRoute(fm.GET "/owners/find", find_owners)
 fm.setRoute(fm.GET "/", welcome)
 
