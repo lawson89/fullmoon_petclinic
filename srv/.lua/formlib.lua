@@ -1,34 +1,29 @@
 local fm = require "fullmoon"
 
 
-Form = {
-  bound = false,
-  fieldDefs = nil,
-  validator = nil,
-  fields = nil,
-  valid = false
-}
+Form = {}
 
 function Form:new(o)
   o = o or {}
   self.__index = self
   setmetatable(o, self)
+  -- initial values
+  o.bound = false
+  o.valid = false
   if o.fieldDefs then
       o.fields = {}
       for _, fieldDef in ipairs(o.fieldDefs) do
-        o.fields[fieldDef.name] = {value="nil", errors="nil"}
+        o.fields[fieldDef.name] = fieldDef
       end
   end
-  o.bound = false
-  o.valid = false
   return o
 end
 
 function Form:bind(params)
-  for fieldName, fieldData in pairs(self.fields) do
+  for fieldName, field in pairs(self.fields) do
     local paramValue = params[fieldName]
     if paramValue then
-      fieldData.value = paramValue
+      field.value = paramValue
     end
   end
   self.bound = true
@@ -53,16 +48,17 @@ function Form:validate(params)
   end
   if self.validator then
     local valid, errors = self.validator(params)
-    fm.logInfo(dump(errors))
     if valid then
       self.valid = true
     else 
-      for fieldName, fieldData in pairs(self.fields) do
+      for fieldName, field in pairs(self.fields) do
       fm.logInfo(fieldName)
           if errors[fieldName] then
-              fieldData.errors = errors[fieldName]
+              field.errors = {errors[fieldName]}
+              field.has_errors = true
           else
-              fieldData.errors = {}
+              field.errors = {}
+              field.has_errors = false
           end            
       end
       self.valid = false
