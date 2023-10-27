@@ -2,13 +2,17 @@
 -- framework setup
 local fm = require "fullmoon"
 
+-- local setup
+local formlib = require "formlib"
+
 -- set template folder and extensions
 fm.setTemplate({ "/templates/", fmt = "fmt" })
 
 local pc = {}
 
 -- utility functions
-function dump(o)
+-- https://stackoverflow.com/questions/9168058/how-to-dump-a-table-to-console
+local function dump(o)
    if type(o) == 'table' then
       local s = '{ '
       for k,v in pairs(o) do
@@ -43,28 +47,70 @@ local function find_owners(r)
      end
 end
 
-local new_owner_validator = fm.makeValidator({
-        {"firstName", minlen=5, maxlen=64, msg = "Invalid %s format"},
+local new_owner_form = { 
+    fields = {
+        {name = "firstName", label="First Name", widget="text"},
+        {name = "lastName", label="Last Name", widget="text"}
+    },
+    validator = fm.makeValidator({
+        {"firstName", minlen=5, maxlen=64, oneof={'bill'}, msg = "First Name must be <+5 and <=64 characters"},      
         all = true,
         key = true
     })
+}
+
+local function add_errors(form, errors)    
+    for _, field in ipairs(form.fields) do
+        local fieldName = field.name
+        fm.logInfo(string.format("field name = %s", fieldName))
+        if errors[fieldName] then
+            field.errors = errors[fieldName]
+        else
+            field.errors = {}
+        end            
+    end
+end
 
 local function new_owner(r)
-    fm.logInfo(r.method)
-    if r.method == 'GET' then
-        return fm.serveContent("owners/createOrUpdateOwnerForm", {})
-    else
-        fm.logInfo(string.format("%s", dump(r.params)))
-        local valid, error = new_owner_validator(r.params)
-        fm.logInfo(string.format("%s", valid))
-        fm.logInfo(string.format("%s", dump(error)))
-        if valid then
+   local f = Form:new({
+      fieldDefs = {
+         {name = "firstName", label="First Name", widget="text"},
+         {name = "lastName", label="Last Name", widget="text"}
+      },
+      validator = fm.makeValidator({
+        {"firstName", minlen=5, maxlen=64, oneof={'bill'}, msg = "First Name must be <+5 and <=64 characters"},      
+        all = true,
+        key = true
+      })
+    })
+    fm.logInfo(string.format("form = %s", f))
+    f:bind(r.params)
+    f:validate(r.params)
+    fm.logInfo(string.format("form = %s", f))
+    
+   fm.logInfo(string.format("method = %s", r.method))
+   fm.logInfo(string.format("params = %s", dump(GetParams())))
+   for k,v in pairs(r.params) do
+      fm.logInfo(string.format("%s=%s", k, v))
+   end
+   local form = new_owner_form
+   fm.logInfo(string.format("form = %s", dump(form)))
+   if r.method == 'GET' then
+      return fm.serveContent("owners/createOrUpdateOwnerForm", {form=form})
+   else
+      local valid, errors = new_owner_form.validator(r.params)
+      fm.logInfo(string.format("%s", valid))
+      fm.logInfo(string.format("%s", dump(errors)))
+      if valid then
             assert(pc.dbm:execute("insert into owners (first_name, last_name, address, city, telephone) values (?, ?, ?, ?, ?)",
-                r.params.firstName, r.params.lastName, r.params.address, r.params.city, r.params.telephone))
+               r.params.firstName, r.params.lastName, r.params.address, r.params.city, r.params.telephone))
             return fm.serveRedirect("owners/find")   
-        end
-        return fm.serveContent("owners/createOrUpdateOwnerForm", {})
-    end
+      else
+            add_errors(form, errors)
+            fm.logInfo(string.format("form = %s", dump(form)))
+      end
+      return fm.serveContent("owners/createOrUpdateOwnerForm", {form=form})
+   end
 end
 
 fm.setRoute("/owners/new", new_owner)

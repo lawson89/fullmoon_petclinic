@@ -18,7 +18,7 @@ REDBEAN_DL=https://redbean.dev/redbean-${REDBEAN_MODE}${REDBEAN_VERSION}.com
 
 SQLITE3=sqlite3.com
 SQLITE3_DL=https://redbean.dev/sqlite3.com
-ZIP=zip.com
+ZIP=zip
 ZIP_DL=https://redbean.dev/zip.com
 UNZIP=unzip.com
 UNZIP_DL=https://redbean.dev/unzip.com
@@ -29,7 +29,7 @@ NPD=--no-print-directory
 
 all: download add
 
-download: ${REDBEAN} ${SQLITE3} ${ZIP} ${UNZIP} ${DEFINITIONS}
+download: ${REDBEAN} ${SQLITE3} ${UNZIP} ${DEFINITIONS}
 
 ${REDBEAN}.template:
 	curl -s ${REDBEAN_DL} -o $@ -z $@ && \
@@ -43,8 +43,8 @@ ${SQLITE3}:
 	chmod +x ${SQLITE3}
 
 ${ZIP}:
-	curl -s ${ZIP_DL} -o $@ -z $@
-	chmod +x ${ZIP}
+	# curl -s ${ZIP_DL} -o $@ -z $@
+	# chmod +x ${ZIP}
 
 ${UNZIP}:
 	curl -s ${UNZIP_DL} -o $@ -z $@
@@ -56,7 +56,7 @@ ${DEFINITIONS}:
 
 add: ${ZIP} ${REDBEAN}
 	cp -f ${REDBEAN}.template ${REDBEAN}
-	cd srv/ && ../${ZIP} -r -n woff ../${REDBEAN} `ls -A`
+	cd srv/ && ${ZIP} -r -n woff ../${REDBEAN} `ls -A`
 
 ls: ${UNZIP}
 	@./${UNZIP} -vl ./${REDBEAN} | grep -v \
