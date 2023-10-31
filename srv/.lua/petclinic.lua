@@ -62,11 +62,11 @@ end
 local function new_owner(r)
   local form = Form:new({
     fields = {
-        {name="firstName", label="First Name", widget="text", validators = {minlen=5, maxlen=64, msg = "First Name must be <+5 and <=64 characters"}},
-        {name="lastName", label="Last Name", widget="text", validators = {minlen=5, maxlen=64, msg = "Last Name must be <+5 and <=64 characters"}},
-        {name="address", label="Address", widget="text", validators = {minlen=5, maxlen=64, msg = "First Name must be <+5 and <=64 characters"}},
-        {name="city", label="City", widget="text", validators = {minlen=5, maxlen=64, msg = "Last Name must be <+5 and <=64 characters"}},
-        {name="telephone", label="Telephone", widget="text", validators = {minlen=5, maxlen=64, msg = "Last Name must be <+5 and <=64 characters"}}
+        {name="firstName", label="First Name", widget="text", validators = {minlen=4, maxlen=64, msg = "First Name must be >4 and <=64 characters"}},
+        {name="lastName", label="Last Name", widget="text", validators = {minlen=5, maxlen=64, msg = "Last Name must be >4 and <=64 characters"}},
+        {name="address", label="Address", widget="text", validators = {minlen=5, maxlen=64, msg = "Address must be >5 and <=128 characters"}},
+        {name="city", label="City", widget="text", validators = {minlen=5, maxlen=64, msg = "City must be >4 and <=128 characters"}},
+        {name="telephone", label="Telephone", widget="text", validators = {minlen=10, maxlen=10, msg = "Please use 10 digit telephone number with area code"}}
     }
   })
     

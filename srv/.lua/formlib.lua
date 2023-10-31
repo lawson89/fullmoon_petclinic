@@ -21,7 +21,7 @@ function Form:new(o)
   setmetatable(o, self)
   -- initial values
   o.fields = o.fields or {}
-  -- validator
+  -- validator - add field name
   for _, field in ipairs(o.fields) do    
     if field.validators then
       field.validators[1]=field.name
@@ -49,7 +49,6 @@ function Form:validate(params)
   for _, field in ipairs(self.fields) do
     -- run validator for each field
     if field.validators then
-      fm.logInfo(string.format("validators=%s",dump(field.validators)))
       local validator = fm.makeValidator({field.validators})
       local valid, error = validator(params)
       fm.logInfo(string.format("valid=%s", valid))
