@@ -47,18 +47,6 @@ local function find_owners(r)
      end
 end
 
-local new_owner_form = { 
-    fields = {
-        {name = "firstName", label="First Name", widget="text"},
-        {name = "lastName", label="Last Name", widget="text"}
-    },
-    validator = fm.makeValidator({
-        {"firstName", minlen=5, maxlen=64, oneof={'bill'}, msg = "First Name must be <+5 and <=64 characters"},      
-        all = true,
-        key = true
-    })
-}
-
 local function add_errors(form, errors)    
     for _, field in ipairs(form.fields) do
         local fieldName = field.name
@@ -72,45 +60,30 @@ local function add_errors(form, errors)
 end
 
 local function new_owner(r)
-   local f = Form:new({
-      fieldDefs = {
-         {name = "firstName", label="First Name", widget="text"},
-         {name = "lastName", label="Last Name", widget="text"}
-      },
-      validator = fm.makeValidator({
-        {"firstName", minlen=5, maxlen=64, oneof={'bill'}, msg = "First Name must be <+5 and <=64 characters"},      
-        all = true,
-        key = true
-      })
-    })
-    fm.logInfo(string.format("form = %s", f))
-    f:bind(r.params)
-    f:validate(r.params)
-    fm.logInfo(string.format("form = %s", f))
+  local form = Form:new({
+    fields = {
+        {name="firstName", label="First Name", widget="text", validators = {minlen=5, maxlen=64, msg = "First Name must be <+5 and <=64 characters"}},
+        {name="lastName", label="Last Name", widget="text", validators = {minlen=5, maxlen=64, msg = "Last Name must be <+5 and <=64 characters"}},
+        {name="address", label="Address", widget="text", validators = {minlen=5, maxlen=64, msg = "First Name must be <+5 and <=64 characters"}},
+        {name="city", label="City", widget="text", validators = {minlen=5, maxlen=64, msg = "Last Name must be <+5 and <=64 characters"}},
+        {name="telephone", label="Telephone", widget="text", validators = {minlen=5, maxlen=64, msg = "Last Name must be <+5 and <=64 characters"}}
+    }
+  })
     
-   fm.logInfo(string.format("method = %s", r.method))
-   fm.logInfo(string.format("params = %s", dump(GetParams())))
-   for k,v in pairs(r.params) do
-      fm.logInfo(string.format("%s=%s", k, v))
-   end
-   local form = new_owner_form
-   fm.logInfo(string.format("form = %s", dump(form)))
-   if r.method == 'GET' then
-      return fm.serveContent("owners/createOrUpdateOwnerForm", {form=form})
-   else
-      local valid, errors = new_owner_form.validator(r.params)
-      fm.logInfo(string.format("%s", valid))
-      fm.logInfo(string.format("%s", dump(errors)))
-      if valid then
-            assert(pc.dbm:execute("insert into owners (first_name, last_name, address, city, telephone) values (?, ?, ?, ?, ?)",
-               r.params.firstName, r.params.lastName, r.params.address, r.params.city, r.params.telephone))
-            return fm.serveRedirect("owners/find")   
-      else
-            add_errors(form, errors)
-            fm.logInfo(string.format("form = %s", dump(form)))
-      end
-      return fm.serveContent("owners/createOrUpdateOwnerForm", {form=form})
-   end
+  if r.method == 'GET' then
+    return fm.serveContent("owners/createOrUpdateOwnerForm", {form=form})
+  else
+    fm.logInfo(string.format("form = %s", form))
+    form:bind(r.params)
+    form:validate(r.params)
+    fm.logInfo(string.format("form = %s", form))
+    if form.valid then
+      assert(pc.dbm:execute("insert into owners (first_name, last_name, address, city, telephone) values (?, ?, ?, ?, ?)",
+         r.params.firstName, r.params.lastName, r.params.address, r.params.city, r.params.telephone))
+      return fm.serveRedirect(303, "/owners/find")   
+    end
+    return fm.serveContent("owners/createOrUpdateOwnerForm", {form=form})
+  end
 end
 
 fm.setRoute("/owners/new", new_owner)
