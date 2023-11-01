@@ -59,7 +59,7 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="/oups" title="trigger a RuntimeException to see how it is handled">
+                    <a class="nav-link" href="/oops" title="trigger a RuntimeException to see how it is handled">
                         <span class="fa fa-exclamation-triangle"></span>
                         <span>Error</span>
                     </a>
