@@ -40,9 +40,8 @@ end
 local function owner_details(r)
     if r.params.id then
         local dbconn = pc:dbconn()
-        local owner = assert(dbconn:query("select * from owners where id=?", {r.params.id}))
-        if #owner >= 1 then
-          owner = owner[1]
+        local owner = assert(dbconn:queryOne("select * from owners where id=?", {r.params.id}))
+        if owner then
           return fm.serveContent("owners/ownerDetails", {owner = owner}) 
         end
     end
@@ -65,9 +64,8 @@ end
 local function editOwner(r)
   if r.method == 'GET' then
     local dbconn = pc:dbconn()
-    local owner = assert(dbconn:query("select * from owners where id=?", {r.params.id}))
-    if #owner >= 1 then
-      owner = owner[1]
+    local owner = assert(dbconn:queryOne("select * from owners where id=?", {r.params.id}))
+    if owner then
       local form = newOwnerForm()
       form:bind(owner)
       return fm.serveContent("owners/createOrUpdateOwnerForm", {form = form}) 

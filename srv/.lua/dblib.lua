@@ -33,14 +33,26 @@ end
 
 function Dbconn:query(sql, parms)
         fm.logInfo(string.format("Executing: %s", sql))
-        local changes
+        local results
         if parms then
-          changes = self.dbm:fetchAll(sql, table.unpack(parms))
+          results = self.dbm:fetchAll(sql, table.unpack(parms))
         else
-          changes = self.dbm:fetchAll(sql)
+          results = self.dbm:fetchAll(sql)
         end
-        fm.logInfo(string.format("row(s) changed: %s", changes))    
-        return changes
+        fm.logInfo(string.format("results: %s", util.dump(results)))    
+        return results
+end
+
+function Dbconn:queryOne(sql, parms)
+        fm.logInfo(string.format("Executing: %s", sql))
+        local results
+        if parms then
+          results = self.dbm:fetchOne(sql, table.unpack(parms))
+        else
+          results = self.dbm:fetchOne(sql)
+        end
+        fm.logInfo(string.format("results: %s", util.dump(results)))      
+        return results
 end
 
 
