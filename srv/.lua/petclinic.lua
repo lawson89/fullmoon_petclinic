@@ -19,13 +19,14 @@ end
 
 local function find_owners(r)
     if r.params.lastName then
-        local result = assert(pc:dbconn():query("SELECT * FROM owners where last_name LIKE ? order by last_name",
+        local dbconn = pc:dbconn()
+        local owners = assert(dbconn:query("select *, (select group_concat(name) from pets where pets.owner_id=owners.id) as pets from owners where last_name LIKE ? order by last_name",
             {r.params.lastName.."%"}))
 
-        fm.logInfo(string.format("Rows: %s", #result))
+        fm.logInfo(string.format("Rows: %s", #owners))
 
         -- the resulting rows are key-value pair with the column as the key
-        return fm.serveContent("owners/ownersList", {owners = result})
+        return fm.serveContent("owners/ownersList", {owners = owners})
      else
        return fm.serveContent("owners/findOwners", {})
      end

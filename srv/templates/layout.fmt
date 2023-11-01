@@ -27,7 +27,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark" role="navigation">
     <div class="container-fluid">
         <span class="navbar-brand">Fullmoon PetClinic</span>
-        <a class="navbar-brand" href="/"><span></span></a>
+        <!--<a class="navbar-brand" href="/"><span></span></a>-->
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-navbar">
             <span class="navbar-toggler-icon"></span>
@@ -73,7 +73,7 @@
     <div class="container xd-container">
      <body>
         {% function block.content() %}
-        <img src="/redbean.png" class="logo">
+        <img src="/images/redbean.png" class="logo">
         {% end %}
         {% block.content() %}
     </body>
@@ -84,7 +84,8 @@
       <div class="container">
         <div class="row">
           <div class="col-12 text-center">
-            This is the footer
+          Fullmoon PetClinic - powered by Redbean
+            <img src="/images/redbean.png" alt="Redbean" class="logo" style="width:32px">
           </div>
         </div>
       </div>
