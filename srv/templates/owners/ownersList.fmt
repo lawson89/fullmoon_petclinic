@@ -15,7 +15,7 @@
   {% for _, owner in ipairs(owners) do %}
   <tr>
     <td>
-      <a href="/owners/2">{%= owner.first_name%} {%= owner.last_name%}</a>
+      <a href="/owners/{%=owner.id%}">{%= owner.first_name%} {%= owner.last_name%}</a>
     </td>
     <td>{%= owner.address %}</td>
     <td>{%= owner.city %}</td>

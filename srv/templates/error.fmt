@@ -1,0 +1,5 @@
+ {% function block.content() %}
+        <img class="img-responsive" src="images/pets.png"/><h2>Something happened...</h2>
+    <p></p>  
+{% end %}
+{% render('layout') %}

@@ -5,6 +5,7 @@ local fm = require "fullmoon"
 -- local setup
 require "formlib"
 require "dblib"
+local util = require "util"
 
 -- set template folder and extensions
 fm.setTemplate({ "/templates/", fmt = "fmt" })
@@ -12,10 +13,14 @@ fm.setTemplate({ "/templates/", fmt = "fmt" })
 local pc = {}
 
 -- set routes and handlers
--- set routes and handlers
 local function welcome(r)
     return fm.serveContent("welcome", {})
 end
+
+local function showError(r)
+    return fm.serveContent("error", {})
+end
+
 
 local function find_owners(r)
     if r.params.lastName then
@@ -30,6 +35,18 @@ local function find_owners(r)
      else
        return fm.serveContent("owners/findOwners", {})
      end
+end
+
+local function owner_details(r)
+    if r.params.id then
+        local dbconn = pc:dbconn()
+        local owner = assert(dbconn:query("select * from owners where id=?", {r.params.id}))
+        if #owner >= 1 then
+          owner = owner[1]
+          return fm.serveContent("owners/ownerDetails", {owner = owner}) 
+        end
+    end
+    return fm.serveRedirect(303, "/oops")
 end
 
 
@@ -62,7 +79,9 @@ end
 
 fm.setRoute("/owners/new", new_owner)
 fm.setRoute(fm.GET "/owners/find", find_owners)
+fm.setRoute(fm.GET "/owners/:id[%d]", owner_details)
 fm.setRoute(fm.GET "/", welcome)
+fm.setRoute(fm.GET "/oops", showError)
 
 -- set static assets
 fm.setRoute("/*", "/assets/*")
