@@ -3,33 +3,18 @@
 local fm = require "fullmoon"
 
 -- local setup
-local formlib = require "formlib"
-local dblib = require "dblib"
+require "formlib"
+require "dblib"
 
 -- set template folder and extensions
 fm.setTemplate({ "/templates/", fmt = "fmt" })
 
 local pc = {}
 
--- utility functions
--- https://stackoverflow.com/questions/9168058/how-to-dump-a-table-to-console
-local function dump(o)
-   if type(o) == 'table' then
-      local s = '{ '
-      for k,v in pairs(o) do
-         if type(k) ~= 'number' then k = '"'..k..'"' end
-         s = s .. '['..k..'] = ' .. dump(v) .. ','
-      end
-      return s .. '} '
-   else
-      return tostring(o)
-   end
-end
-
-
+-- set routes and handlers
 -- set routes and handlers
 local function welcome(r)
-    return fm.serveContent("welcome", { name = 'rick' })
+    return fm.serveContent("welcome", {})
 end
 
 local function find_owners(r)
@@ -91,14 +76,16 @@ end
 local DBNAME = 'fullmoon_petclinic.db'
 function pc:initDb()
     fm.logInfo("Initializing database")
-    fm.logInfo("Loading schema sql")
     local dbm = fm.makeStorage(DBNAME)
-    local dbconn = Dbconn:new({dbm = dbm})
-    fm.logInfo("created dbconnection")
-    dbconn:runSqlInFile("./db/schema.sql")
---    fm.logInfo("Loading data sql")
---    dbconn:runSqlInFile("./db/data.sql")
     self.dbm = dbm
+    local dbconn = self:dbconn()
+    dbconn:runSqlInFile("./db/schema.sql")
+    dbconn:runSqlInFile("./db/data.sql")
+
+end
+
+function pc:dbconn()
+  return Dbconn:new({dbm = self.dbm})
 end
 
 return pc

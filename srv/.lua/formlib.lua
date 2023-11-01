@@ -1,17 +1,5 @@
 local fm = require "fullmoon"
-
-local function dump(o)
-   if type(o) == 'table' then
-      local s = '{ '
-      for k,v in pairs(o) do
-         if type(k) ~= 'number' then k = '"'..k..'"' end
-         s = s .. '['..k..'] = ' .. dump(v) .. ','
-      end
-      return s .. '} '
-   else
-      return tostring(o)
-   end
-end
+local util = require "util"
 
 Form = {bound = false, valid = false}
 
@@ -71,7 +59,7 @@ end
 
 
 function Form:__tostring()
-    return dump(self)
+    return util.dump(self)
 end
 
 
