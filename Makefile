@@ -56,7 +56,7 @@ ${DEFINITIONS}:
 
 add: ${ZIP} ${REDBEAN}
 	cp -f ${REDBEAN}.template ${REDBEAN}
-	cd srv/ && ${ZIP} -r -n woff ../${REDBEAN} `ls -A`
+	cd srv/ && ${ZIP} -r ../${REDBEAN} `ls -A`
 
 ls: ${UNZIP}
 	@./${UNZIP} -vl ./${REDBEAN} | grep -v \

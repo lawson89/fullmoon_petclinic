@@ -47,27 +47,16 @@ local function find_owners(r)
      end
 end
 
-local function add_errors(form, errors)    
-    for _, field in ipairs(form.fields) do
-        local fieldName = field.name
-        fm.logInfo(string.format("field name = %s", fieldName))
-        if errors[fieldName] then
-            field.errors = errors[fieldName]
-        else
-            field.errors = {}
-        end            
-    end
-end
 
 local function new_owner(r)
   local form = Form:new({
     fields = {
-        {name="firstName", label="First Name", widget="text", validators = {minlen=4, maxlen=64, msg = "First Name must be >4 and <=64 characters"}},
-        {name="lastName", label="Last Name", widget="text", validators = {minlen=5, maxlen=64, msg = "Last Name must be >4 and <=64 characters"}},
-        {name="address", label="Address", widget="text", validators = {minlen=5, maxlen=64, msg = "Address must be >5 and <=128 characters"}},
-        {name="city", label="City", widget="text", validators = {minlen=5, maxlen=64, msg = "City must be >4 and <=128 characters"}},
-        {name="telephone", label="Telephone", widget="text", validators = {minlen=10, maxlen=10, msg = "Please use 10 digit telephone number with area code"}}
-    }
+        {name="firstName", label="First Name", widget="text", validators = {{minlen=1, msg = "must not be empty"},{maxlen=64, msg="must be more than 64 characters"}}},
+        {name="lastName", label="Last Name", widget="text", validators = {{minlen=1, msg = "must not be empty"},{maxlen=64, msg="must be more than 64 characters"}}},
+        {name="address", label="Address", widget="text", validators = {{minlen=1, msg = "must not be empty"},{maxlen=256, msg="must be more than 256 characters"}}},
+        {name="city", label="City", widget="text", validators = {{minlen=1, msg = "must not be empty"},{maxlen=64, msg="must be less than 64 characters"}}},
+        {name="telephone", label="Telephone", widget="text", validators = {{minlen=1, msg = "must not be empty"},
+            {pattern="%d%d%d%d%d%d%d%d%d%d", msg="must be 10 digits  with no spaces or punctuation"}}}}
   })
     
   if r.method == 'GET' then

@@ -7,8 +7,10 @@
                           <input class="form-control" type="text" id="{%=field.name%}" name="{%=field.name%}" value="{%=field.value%}">                  
                     </div>
                     {% if field.has_errors == true then %}
-                    
-                    <span class="help-inline text-danger"><bold>x</bold>&nbsp;{%= field.errors[1] %}</span>
+                      {% for _, error in ipairs(field.errors) do %}
+                        <span class="fa fa-remove form-control-feedback" aria-hidden="true"></span>
+                        <span class="help-inline">{%= error %}</span><br/>
+                      {% end %}
                     {% end %}
               </div>
         </div>

@@ -22,9 +22,13 @@ function Form:new(o)
   -- initial values
   o.fields = o.fields or {}
   -- validator - add field name
-  for _, field in ipairs(o.fields) do    
+  for _, field in ipairs(o.fields) do   
+    field.errors = {}
+    field.has_errors = false
     if field.validators then
-      field.validators[1]=field.name
+      for _, validatorExpr in ipairs(field.validators) do        
+        validatorExpr[1]=field.name        
+      end
     end
   end
   return o
@@ -47,19 +51,18 @@ function Form:validate(params)
   end
   self.valid = true
   for _, field in ipairs(self.fields) do
-    -- run validator for each field
+    -- run validators for each field
     if field.validators then
-      local validator = fm.makeValidator({field.validators})
-      local valid, error = validator(params)
-      fm.logInfo(string.format("valid=%s", valid))
-      fm.logInfo(string.format("error=%s", error))
-      if not valid then
-        field.errors = {error}
-        field.has_errors = true
-        self.valid = false
-      else
-        field.errors = {}
-        field.has_errors = false
+      for _, validatorExpr in ipairs(field.validators) do
+        local validator = fm.makeValidator({validatorExpr})
+        local valid, error = validator(params)
+        fm.logInfo(string.format("valid=%s", valid))
+        fm.logInfo(string.format("error=%s", error))
+        if not valid then
+          table.insert(field.errors, error)
+          field.has_errors = true
+          self.valid = false
+        end
       end
     end
   end
