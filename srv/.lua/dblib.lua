@@ -23,7 +23,7 @@ function Dbconn:execute(sql, parms)
         fm.logInfo(string.format("Executing: %s", sql))
         local changes
         if parms then
-          changes = self.dbm:execute(sql, tables.unpack(parms))
+          changes = self.dbm:execute(sql, table.unpack(parms))
         else
           changes = self.dbm:execute(sql)
         end
@@ -35,7 +35,7 @@ function Dbconn:query(sql, parms)
         fm.logInfo(string.format("Executing: %s", sql))
         local changes
         if parms then
-          changes = self.dbm:fetchAll(sql, tables.unpack(parms))
+          changes = self.dbm:fetchAll(sql, table.unpack(parms))
         else
           changes = self.dbm:fetchAll(sql)
         end

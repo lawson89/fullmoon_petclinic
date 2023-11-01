@@ -19,10 +19,8 @@ end
 
 local function find_owners(r)
     if r.params.lastName then
-        local result = assert(pc.dbm:fetchAll([[
-            SELECT *
-            FROM owners
-            where last_name LIKE ? order by last_name]],r.params.lastName.."%"))
+        local result = assert(pc:dbconn():query("SELECT * FROM owners where last_name LIKE ? order by last_name",
+            {r.params.lastName.."%"}))
 
         fm.logInfo(string.format("Rows: %s", #result))
 
@@ -53,8 +51,8 @@ local function new_owner(r)
     form:validate(r.params)
     fm.logInfo(string.format("form = %s", form))
     if form.valid then
-      assert(pc.dbm:execute("insert into owners (first_name, last_name, address, city, telephone) values (?, ?, ?, ?, ?)",
-         r.params.firstName, r.params.lastName, r.params.address, r.params.city, r.params.telephone))
+      assert(pc:dbconn():execute("insert into owners (first_name, last_name, address, city, telephone) values (?, ?, ?, ?, ?)",
+         {r.params.firstName, r.params.lastName, r.params.address, r.params.city, r.params.telephone}))
       return fm.serveRedirect(303, "/owners/find")   
     end
     return fm.serveContent("owners/createOrUpdateOwnerForm", {form=form})
