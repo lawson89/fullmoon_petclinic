@@ -49,17 +49,35 @@ local function owner_details(r)
     return fm.serveRedirect(303, "/oops")
 end
 
-
-local function new_owner(r)
-  local form = Form:new({
+local function newOwnerForm()
+    local form = Form:new({
     fields = {
-        {name="firstName", label="First Name", widget="text", validators = {{minlen=1, msg = "must not be empty"},{maxlen=64, msg="must be more than 64 characters"}}},
-        {name="lastName", label="Last Name", widget="text", validators = {{minlen=1, msg = "must not be empty"},{maxlen=64, msg="must be more than 64 characters"}}},
+        {name="first_name", label="First Name", widget="text", validators = {{minlen=1, msg = "must not be empty"},{maxlen=64, msg="must be more than 64 characters"}}},
+        {name="last_name", label="Last Name", widget="text", validators = {{minlen=1, msg = "must not be empty"},{maxlen=64, msg="must be more than 64 characters"}}},
         {name="address", label="Address", widget="text", validators = {{minlen=1, msg = "must not be empty"},{maxlen=256, msg="must be more than 256 characters"}}},
         {name="city", label="City", widget="text", validators = {{minlen=1, msg = "must not be empty"},{maxlen=64, msg="must be less than 64 characters"}}},
         {name="telephone", label="Telephone", widget="text", validators = {{minlen=1, msg = "must not be empty"},
             {pattern="%d%d%d%d%d%d%d%d%d%d", msg="must be 10 digits  with no spaces or punctuation"}}}}
-  })
+    })
+    return form
+end
+
+local function editOwner(r)
+  if r.method == 'GET' then
+    local dbconn = pc:dbconn()
+    local owner = assert(dbconn:query("select * from owners where id=?", {r.params.id}))
+    if #owner >= 1 then
+      owner = owner[1]
+      local form = newOwnerForm()
+      form:bind(owner)
+      return fm.serveContent("owners/createOrUpdateOwnerForm", {form = form}) 
+    end
+  end
+end
+
+
+local function new_owner(r)
+  local form = newOwnerForm()
     
   if r.method == 'GET' then
     return fm.serveContent("owners/createOrUpdateOwnerForm", {form=form})
@@ -80,6 +98,7 @@ end
 fm.setRoute("/owners/new", new_owner)
 fm.setRoute(fm.GET "/owners/find", find_owners)
 fm.setRoute(fm.GET "/owners/:id[%d]", owner_details)
+fm.setRoute(fm.GET "/owners/:id[%d]/edit", editOwner)
 fm.setRoute(fm.GET "/", welcome)
 fm.setRoute(fm.GET "/oops", showError)
 
