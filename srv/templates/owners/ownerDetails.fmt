@@ -56,8 +56,8 @@
                 </thead>
                 
                 <tbody><tr>
-                  <td><a href="2/pets/2/edit">Edit Pet</a></td>
-                  <td><a href="2/pets/2/visits/new">Add Visit</a></td>
+                  <td><a href="{%=owner.id%}/pets/{%=pet.id%}/edit">Edit Pet</a></td>
+                  <td><a href="{%=owner.id%}/pets/{%=pet.id%}/visits/new">Add Visit</a></td>
                 </tr>
               </tbody></table>
             </td>

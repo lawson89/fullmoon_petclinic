@@ -41,7 +41,7 @@ local function showOwner(r)
     if r.params.id then
         local dbconn = pc:dbconn()
         local owner = assert(dbconn:queryOne("select * from owners where id=?", {r.params.id}))
-        local pets = dbconn:query("select pets.name, birth_date, types.name as type from pets, types where pets.type_id = types.id and pets.owner_id= ? order by      pets.name", {r.params.id}) or {}
+        local pets = dbconn:query("select pets.id, pets.name, birth_date, types.name as type from pets, types where pets.type_id = types.id and pets.owner_id= ? order by      pets.name", {r.params.id}) or {}
         
         if owner then
           return fm.serveContent("owners/ownerDetails", {owner = owner, pets = pets}) 
@@ -111,17 +111,41 @@ local function petForm()
     fields = {
         {name="name", label="Name", widget="text", validators = {{minlen=1, msg = "must not be empty"},{maxlen=64, msg="must be more than 64 characters"}}},
         {name="birth_date", label="Birth Date", widget="date", validators = {{minlen=1, msg = "must not be empty"}}},
-        {name="type", label="Type", widget="select", options={}, validators = {{minlen=1, msg = "must not be empty"}}}}
+        {name="type_id", label="Type", widget="select", options={}, validators = {}}}
     })
     return form
+end
+
+local function editPet(r)
+  local dbconn = pc:dbconn()
+  local form = petForm()
+  local typeOptions = assert(dbconn:query("select id as value, name as label from types order by name"))
+  form:setFieldOptions('type_id', typeOptions)
+  
+  if r.method == 'GET' then
+    local owner = assert(dbconn:queryOne("select * from owners where id=?", {r.params.id}))
+    local pet = assert(dbconn:queryOne("select * from pets where id=?", {r.params.pet_id}))
+    form:bind(pet)
+    fm.logInfo(util.dump(form))
+  else
+    form:bind(r.params)
+    form:validate(r.params)
+    if form.valid then
+      -- todo this would be a lot cleaner with named sql placeholders
+      -- then we could just pass the form and have it match up by name
+      assert(dbconn:execute("update pets set name=?, birth_date=?, type_id=? where id=?",
+        {r.params.name, r.params.birth_date, r.params.type_id, r.params.pet_id}))
+      return fm.serveRedirect(303, "/owners/"..r.params.id)
+    end
+  end
+  return fm.serveContent("pets/createOrUpdatePetForm", {form = form, owner=owner, action='edit'}) 
 end
 
 local function newPet(r)
   local dbconn = pc:dbconn()
   local form = petForm()
   local typeOptions = assert(dbconn:query("select id as value, name as label from types order by name"))
-  form:setFieldOptions('type', typeOptions)
-  fm.logInfo(util.dump(form))
+  form:setFieldOptions('type_id', typeOptions)
     
   if r.method == 'GET' then    
     local owner = assert(dbconn:queryOne("select * from owners where id=?", {r.params.id}))
@@ -131,7 +155,7 @@ local function newPet(r)
     form:validate(r.params)
     if form.valid then
       assert(pc:dbconn():execute("insert into pets (name, birth_date, type_id, owner_id) values (?, ?, ?, ?)",
-         {r.params.name, r.params.birth_date, r.params.type, r.params.id}))
+         {r.params.name, r.params.birth_date, r.params.type_id, r.params.id}))
       return fm.serveRedirect(303, "/owners/"..r.params.id)   
     end
     return fm.serveContent("owners/createOrUpdatePetForm", {form=form})
@@ -151,6 +175,7 @@ fm.setRoute(fm.GET "/owners/find", findOwners)
 fm.setRoute(fm.GET "/owners/:id[%d]", showOwner)
 fm.setRoute("/owners/:id[%d]/edit", editOwner)
 fm.setRoute("/owners/:id[%d]/pets/new", newPet)
+fm.setRoute("/owners/:id[%d]/pets/:pet_id[%d]/edit", editPet)
 fm.setRoute(fm.GET "/vets", vetList)
 fm.setRoute(fm.GET "/", welcome)
 fm.setRoute(fm.GET "/oops", showError)
