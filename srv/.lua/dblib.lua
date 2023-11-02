@@ -32,7 +32,7 @@ function Dbconn:execute(sql, parms)
 end
 
 function Dbconn:query(sql, parms)
-        fm.logInfo(string.format("Executing: %s", sql))
+        fm.logInfo(string.format("Executing: %s\nparams: %s", sql, util.dump(parms)))
         local results
         if parms then
           results = self.dbm:fetchAll(sql, table.unpack(parms))
@@ -44,7 +44,7 @@ function Dbconn:query(sql, parms)
 end
 
 function Dbconn:queryOne(sql, parms)
-        fm.logInfo(string.format("Executing: %s", sql))
+        fm.logInfo(string.format("Executing: %s\nparams: %s", sql, util.dump(parms)))
         local results
         if parms then
           results = self.dbm:fetchOne(sql, table.unpack(parms))

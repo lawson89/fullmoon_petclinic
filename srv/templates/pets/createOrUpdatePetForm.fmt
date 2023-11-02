@@ -1,7 +1,6 @@
 {% function block.content() %}
   <h2>
-    New 
-    Pet
+    New Pet
   </h2>
   <form class="form-horizontal" method="post">
      {% render('fragments/form', {form = form}) %}

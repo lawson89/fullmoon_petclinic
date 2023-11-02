@@ -41,8 +41,10 @@ local function showOwner(r)
     if r.params.id then
         local dbconn = pc:dbconn()
         local owner = assert(dbconn:queryOne("select * from owners where id=?", {r.params.id}))
+        local pets = dbconn:query("select pets.name, birth_date, types.name as type from pets, types where pets.type_id = types.id and pets.owner_id= ? order by      pets.name", {r.params.id}) or {}
+        
         if owner then
-          return fm.serveContent("owners/ownerDetails", {owner = owner}) 
+          return fm.serveContent("owners/ownerDetails", {owner = owner, pets = pets}) 
         end
     end
     return fm.serveRedirect(303, "/oops")
@@ -57,16 +59,6 @@ local function ownerForm()
         {name="city", label="City", widget="text", validators = {{minlen=1, msg = "must not be empty"},{maxlen=64, msg="must be less than 64 characters"}}},
         {name="telephone", label="Telephone", widget="text", validators = {{minlen=1, msg = "must not be empty"},
             {pattern="%d%d%d%d%d%d%d%d%d%d", msg="must be 10 digits  with no spaces or punctuation"}}}}
-    })
-    return form
-end
-
-local function petForm()
-    local form = Form:new({
-    fields = {
-        {name="name", label="Name", widget="text", validators = {{minlen=1, msg = "must not be empty"},{maxlen=64, msg="must be more than 64 characters"}}},
-        {name="birth_date", label="Birth Date", widget="date", validators = {{minlen=1, msg = "must not be empty"}}},
-        {name="type", label="Type", widget="select", options={}, validators = {{minlen=1, msg = "must not be empty"}}}}
     })
     return form
 end
@@ -111,6 +103,17 @@ local function newOwner(r)
   end
 end
 
+
+local function petForm()
+    local form = Form:new({
+    fields = {
+        {name="name", label="Name", widget="text", validators = {{minlen=1, msg = "must not be empty"},{maxlen=64, msg="must be more than 64 characters"}}},
+        {name="birth_date", label="Birth Date", widget="date", validators = {{minlen=1, msg = "must not be empty"}}},
+        {name="type", label="Type", widget="select", options={}, validators = {{minlen=1, msg = "must not be empty"}}}}
+    })
+    return form
+end
+
 local function newPet(r)
   local dbconn = pc:dbconn()
   local form = petForm()
@@ -125,11 +128,11 @@ local function newPet(r)
     form:bind(r.params)
     form:validate(r.params)
     if form.valid then
-      assert(pc:dbconn():execute("insert into pets (first_name, last_name, address, city, telephone) values (?, ?, ?, ?, ?)",
-         {r.params.firstName, r.params.lastName, r.params.address, r.params.city, r.params.telephone}))
-      return fm.serveRedirect(303, "/owners/find")   
+      assert(pc:dbconn():execute("insert into pets (name, birth_date, type_id, owner_id) values (?, ?, ?, ?)",
+         {r.params.name, r.params.birth_date, r.params.type, r.params.id}))
+      return fm.serveRedirect(303, "/owners/"..r.params.id)   
     end
-    return fm.serveContent("owners/createOrUpdateOwnerForm", {form=form})
+    return fm.serveContent("owners/createOrUpdatePetForm", {form=form})
   end
 end
 
