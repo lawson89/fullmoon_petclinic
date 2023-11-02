@@ -1,0 +1,22 @@
+{% function block.content() %}
+
+<h2>Veterinarians</h2>
+
+<table id="vets" class="table table-striped">
+  <thead>
+    <tr>
+    <th>Name</th>
+    <th>Specialties</th>
+  </tr>
+  </thead>
+  <tbody>
+  {% for _, vet in ipairs(vets) do %}
+  <tr>
+    <td>{%= vet.first_name%} {%= vet.last_name%}</td>
+    <td> {%= vet.specialties %}</td>
+  </tr>
+  {% end %}
+  </tbody>
+</table>
+{% end %}
+{% render('layout') %}

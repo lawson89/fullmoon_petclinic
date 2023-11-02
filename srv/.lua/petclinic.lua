@@ -101,10 +101,18 @@ local function newOwner(r)
   end
 end
 
+local function vetList(r)
+  local dbconn = pc:dbconn()
+  local vets = assert(dbconn:query("select *, (select group_concat(name) from specialties, vet_specialties where vet_specialties.vet_id=vets.id and vet_specialties.specialty_id=specialties.id) as specialties from vets order by last_name"))
+  return fm.serveContent("vets/vetList", {vets = vets}) 
+end        
+
+
 fm.setRoute("/owners/new", newOwner)
 fm.setRoute(fm.GET "/owners/find", findOwners)
 fm.setRoute(fm.GET "/owners/:id[%d]", showOwner)
 fm.setRoute("/owners/:id[%d]/edit", editOwner)
+fm.setRoute(fm.GET "/vets", vetList)
 fm.setRoute(fm.GET "/", welcome)
 fm.setRoute(fm.GET "/oops", showError)
 
