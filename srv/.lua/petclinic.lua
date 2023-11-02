@@ -101,6 +101,26 @@ local function newOwner(r)
   end
 end
 
+local function newPet(r)
+  local dbconn = pc:dbconn()
+  local form = ownerForm()
+    
+  if r.method == 'GET' then
+    local owner = assert(dbconn:queryOne("select * from owners where id=?", {r.params.id}))
+    return fm.serveContent("pets/createOrUpdatePetForm", {form=form, owner=owner})
+  else
+    form:bind(r.params)
+    form:validate(r.params)
+    if form.valid then
+      assert(pc:dbconn():execute("insert into pets (first_name, last_name, address, city, telephone) values (?, ?, ?, ?, ?)",
+         {r.params.firstName, r.params.lastName, r.params.address, r.params.city, r.params.telephone}))
+      return fm.serveRedirect(303, "/owners/find")   
+    end
+    return fm.serveContent("owners/createOrUpdateOwnerForm", {form=form})
+  end
+end
+
+
 local function vetList(r)
   local dbconn = pc:dbconn()
   local vets = assert(dbconn:query("select *, (select group_concat(name) from specialties, vet_specialties where vet_specialties.vet_id=vets.id and vet_specialties.specialty_id=specialties.id) as specialties from vets order by last_name"))
@@ -112,6 +132,7 @@ fm.setRoute("/owners/new", newOwner)
 fm.setRoute(fm.GET "/owners/find", findOwners)
 fm.setRoute(fm.GET "/owners/:id[%d]", showOwner)
 fm.setRoute("/owners/:id[%d]/edit", editOwner)
+fm.setRoute("/owners/:id[%d]/pets/new", newPet)
 fm.setRoute(fm.GET "/vets", vetList)
 fm.setRoute(fm.GET "/", welcome)
 fm.setRoute(fm.GET "/oops", showError)
