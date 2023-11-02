@@ -19,4 +19,4 @@
   </tbody>
 </table>
 {% end %}
-{% render('layout') %}
+{% render('layout',  {active_menu='vets'}) %}

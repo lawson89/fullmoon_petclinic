@@ -27,4 +27,4 @@
 </table>
 
 {% end %}
-{% render('layout') %}
+{% render('layout', {active_menu='owners'}) %}

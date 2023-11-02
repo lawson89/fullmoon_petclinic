@@ -21,4 +21,4 @@
 
     <a class="btn btn-primary" href="/owners/new">Add Owner</a>
 {% end %}
-{% render('layout') %}
+{% render('layout', {active_menu='owners'}) %}

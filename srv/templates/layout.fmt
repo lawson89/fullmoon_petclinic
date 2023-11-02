@@ -38,28 +38,28 @@
             <ul class="nav navbar-nav me-auto">
 
                 <li class="nav-item">
-                    <a class="nav-link active" href="/" title="home page">
+                    <a class="nav-link {% if active_menu=='home' then%}active{%end%}" href="/" title="home page">
                         <span class="fa fa-home"></span>
                         <span>Home</span>
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="/owners/find" title="find owners">
+                    <a class="nav-link {% if active_menu=='owners' then%}active{%end%}" href="/owners/find" title="find owners">
                         <span class="fa fa-search"></span>
                         <span>Find owners</span>
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="/vets" title="veterinarians">
+                    <a class="nav-link {% if active_menu=='vets' then%}active{%end%}" href="/vets" title="veterinarians">
                         <span class="fa fa-th-list"></span>
                         <span>Veterinarians</span>
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="/oops" title="trigger a RuntimeException to see how it is handled">
+                    <a class="nav-link {% if active_menu=='error' then%}active{%end%}" href="/oops" title="trigger a RuntimeException to see how it is handled">
                         <span class="fa fa-exclamation-triangle"></span>
                         <span>Error</span>
                     </a>

@@ -14,7 +14,7 @@ local pc = {}
 
 -- set routes and handlers
 local function welcome(r)
-  return fm.serveContent("welcome", {})
+  return fm.serveContent("welcome")
 end
 
 local function showError(r)

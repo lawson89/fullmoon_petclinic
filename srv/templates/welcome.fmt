@@ -3,8 +3,7 @@
 <div class="row">
     <div class="col-md-12">
         <img class="img-responsive" src="images/pets.png"/>
-
     </div>
 </div>
 {% end %}
-{% render('layout') %}
+{% render('layout', {active_menu='home'}) %}
