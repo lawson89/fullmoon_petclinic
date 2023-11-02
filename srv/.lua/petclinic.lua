@@ -95,9 +95,11 @@ local function newOwner(r)
     form:bind(r.params)
     form:validate(r.params)
     if form.valid then
-      assert(pc:dbconn():execute("insert into owners (first_name, last_name, address, city, telephone) values (?, ?, ?, ?, ?)",
-         {r.params.firstName, r.params.lastName, r.params.address, r.params.city, r.params.telephone}))
-      return fm.serveRedirect(303, "/owners/find")   
+      local dbconn = pc:dbconn()
+      assert(dbconn:execute("insert into owners (first_name, last_name, address, city, telephone) values (?, ?, ?, ?, ?)",
+         {r.params.first_name, r.params.last_name, r.params.address, r.params.city, r.params.telephone}))
+      local owner_id = assert(dbconn:queryOne("select last_insert_rowid() as num")).num
+      return fm.serveRedirect(303, "/owners/"..owner_id)   
     end
     return fm.serveContent("owners/createOrUpdateOwnerForm", {form=form})
   end
