@@ -22,7 +22,7 @@ local function showError(r)
 end
 
 
-local function find_owners(r)
+local function findOwners(r)
     if r.params.lastName then
         local dbconn = pc:dbconn()
         local owners = assert(dbconn:query("select *, (select group_concat(name) from pets where pets.owner_id=owners.id) as pets from owners where last_name LIKE ? order by last_name",
@@ -37,7 +37,7 @@ local function find_owners(r)
      end
 end
 
-local function owner_details(r)
+local function showOwner(r)
     if r.params.id then
         local dbconn = pc:dbconn()
         local owner = assert(dbconn:queryOne("select * from owners where id=?", {r.params.id}))
@@ -48,7 +48,7 @@ local function owner_details(r)
     return fm.serveRedirect(303, "/oops")
 end
 
-local function newOwnerForm()
+local function ownerForm()
     local form = Form:new({
     fields = {
         {name="first_name", label="First Name", widget="text", validators = {{minlen=1, msg = "must not be empty"},{maxlen=64, msg="must be more than 64 characters"}}},
@@ -62,28 +62,36 @@ local function newOwnerForm()
 end
 
 local function editOwner(r)
+  local dbconn = pc:dbconn()
+  local form = ownerForm()
+  
   if r.method == 'GET' then
-    local dbconn = pc:dbconn()
     local owner = assert(dbconn:queryOne("select * from owners where id=?", {r.params.id}))
-    if owner then
-      local form = newOwnerForm()
-      form:bind(owner)
-      return fm.serveContent("owners/createOrUpdateOwnerForm", {form = form}) 
+    form:bind(owner)
+    return fm.serveContent("owners/createOrUpdateOwnerForm", {form = form, action='edit'}) 
+  else
+    form:bind(r.params)
+    form:validate(r.params)
+    fm.logInfo(util.dump(form))
+    if form.valid then
+      -- todo this would be a lot cleaner with named sql placeholders
+      -- then we could just pass the form and have it match up by name
+      assert(dbconn:execute("update owners set first_name=?, last_name=?, address=?, city=?, telephone=? where id=?",
+        {r.params.first_name, r.params.last_name, r.params.address, r.params.city, r.params.telephone, r.params.id}))
     end
+    return fm.serveRedirect(303, "/owners/"..r.params.id)
   end
 end
 
 
-local function new_owner(r)
-  local form = newOwnerForm()
+local function newOwner(r)
+  local form = ownerForm()
     
   if r.method == 'GET' then
     return fm.serveContent("owners/createOrUpdateOwnerForm", {form=form})
   else
-    fm.logInfo(string.format("form = %s", form))
     form:bind(r.params)
     form:validate(r.params)
-    fm.logInfo(string.format("form = %s", form))
     if form.valid then
       assert(pc:dbconn():execute("insert into owners (first_name, last_name, address, city, telephone) values (?, ?, ?, ?, ?)",
          {r.params.firstName, r.params.lastName, r.params.address, r.params.city, r.params.telephone}))
@@ -93,10 +101,10 @@ local function new_owner(r)
   end
 end
 
-fm.setRoute("/owners/new", new_owner)
-fm.setRoute(fm.GET "/owners/find", find_owners)
-fm.setRoute(fm.GET "/owners/:id[%d]", owner_details)
-fm.setRoute(fm.GET "/owners/:id[%d]/edit", editOwner)
+fm.setRoute("/owners/new", newOwner)
+fm.setRoute(fm.GET "/owners/find", findOwners)
+fm.setRoute(fm.GET "/owners/:id[%d]", showOwner)
+fm.setRoute("/owners/:id[%d]/edit", editOwner)
 fm.setRoute(fm.GET "/", welcome)
 fm.setRoute(fm.GET "/oops", showError)
 

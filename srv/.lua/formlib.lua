@@ -44,8 +44,6 @@ function Form:validate(params)
       for _, validatorExpr in ipairs(field.validators) do
         local validator = fm.makeValidator({validatorExpr})
         local valid, error = validator(params)
-        fm.logInfo(string.format("valid=%s", valid))
-        fm.logInfo(string.format("error=%s", error))
         if not valid then
           table.insert(field.errors, error)
           field.has_errors = true

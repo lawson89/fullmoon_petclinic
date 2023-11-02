@@ -1,11 +1,18 @@
 {% function block.content() %}
 
   <h2>Owner</h2>
-  <form class="form-horizontal" id="add-owner-form" method="post">
+  <form class="form-horizontal" id="owner-form" method="post">
     {% render('fragments/form', {form = form}) %}
     <div class="form-group">
       <div class="col-sm-offset-2 col-sm-10">
-        <button class="btn btn-primary" type="submit">Add Owner</button>
+        <button class="btn btn-primary" type="submit">
+        {% if action == 'edit' then%}
+          Update Owner
+        {% else %}
+          Add Owner
+        {% end %}
+          
+        </button>
       </div>
     </div>
   </form>

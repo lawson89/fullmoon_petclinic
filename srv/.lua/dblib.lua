@@ -20,7 +20,7 @@ function Dbconn:new(o)
 end
 
 function Dbconn:execute(sql, parms)
-        fm.logInfo(string.format("Executing: %s", sql))
+        fm.logInfo(string.format("Executing: %s\nparams: %s", sql, util.dump(parms)))
         local changes
         if parms then
           changes = self.dbm:execute(sql, table.unpack(parms))
