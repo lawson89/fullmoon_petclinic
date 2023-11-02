@@ -54,6 +54,14 @@ function Form:validate(params)
   end
 end
 
+function Form:setFieldOptions(name, options)
+  for _, field in ipairs(self.fields) do
+    if field.name == name then
+      field.options = options
+    end
+  end
+end
+
 
 
 function Form:__tostring()

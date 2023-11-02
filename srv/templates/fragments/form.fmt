@@ -1,5 +1,6 @@
 <div class="form-group has-feedback">
-  {% for _, field in ipairs(form.fields) do %}      
+  {% for _, field in ipairs(form.fields) do %}  
+        {% if field.widget == 'text' then %}
         <div class="form-group">
               <label class="col-sm-2 control-label">{%= field.label %}</label>
               <div class="col-sm-10">
@@ -14,5 +15,42 @@
                     {% end %}
               </div>
         </div>
+        {% elseif field.widget == 'date' then %}
+            <div class="form-group">
+            <label class="col-sm-2 control-label">{%= field.label %}</label>
+            <div class="col-sm-10">
+                <div>
+                    
+                    <input class="form-control" type="date" id="{%=field.name%}" name="{%=field.name%}" value="{%=field.value%}">
+                </div>
+                {% if field.has_errors == true then %}
+                  {% for _, error in ipairs(field.errors) do %}
+                    <span class="fa fa-remove form-control-feedback" aria-hidden="true"></span>
+                    <span class="help-inline">{%= error %}</span><br/>
+                  {% end %}
+                {% end %}          
+            </div>
+          </div>
+        {% elseif field.widget == 'select' then %}
+            <div class="form-group">
+            <label class="col-sm-2 control-label">{%= field.label %}</label>
+
+            <div class="col-sm-10">
+              <select id="type" name="type">
+                {% for _, option in ipairs(field.options) do %}
+                    <option value="{%= option.value%}">{%= option.label %}</option>
+                {% end%}
+              </select>
+                {% if field.has_errors == true then %}
+                  {% for _, error in ipairs(field.errors) do %}
+                    <span class="fa fa-remove form-control-feedback" aria-hidden="true"></span>
+                    <span class="help-inline">{%= error %}</span><br/>
+                  {% end %}
+                {% end %}                  
+            </div>
+          </div>
+        {% else %}
+            Unknown widget type {%= field.widget %}
+        {% end %}
   {% end %}            
 </div>

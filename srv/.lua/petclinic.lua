@@ -61,6 +61,16 @@ local function ownerForm()
     return form
 end
 
+local function petForm()
+    local form = Form:new({
+    fields = {
+        {name="name", label="Name", widget="text", validators = {{minlen=1, msg = "must not be empty"},{maxlen=64, msg="must be more than 64 characters"}}},
+        {name="birth_date", label="Birth Date", widget="date", validators = {{minlen=1, msg = "must not be empty"}}},
+        {name="type", label="Type", widget="select", options={}, validators = {{minlen=1, msg = "must not be empty"}}}}
+    })
+    return form
+end
+
 local function editOwner(r)
   local dbconn = pc:dbconn()
   local form = ownerForm()
@@ -103,9 +113,12 @@ end
 
 local function newPet(r)
   local dbconn = pc:dbconn()
-  local form = ownerForm()
+  local form = petForm()
+  local typeOptions = assert(dbconn:query("select id as value, name as label from types order by name"))
+  form:setFieldOptions('type', typeOptions)
+  fm.logInfo(util.dump(form))
     
-  if r.method == 'GET' then
+  if r.method == 'GET' then    
     local owner = assert(dbconn:queryOne("select * from owners where id=?", {r.params.id}))
     return fm.serveContent("pets/createOrUpdatePetForm", {form=form, owner=owner})
   else
