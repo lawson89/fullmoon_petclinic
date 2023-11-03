@@ -38,7 +38,7 @@
             <div class="col-sm-10">
               <select id="{%=field.name%}" name="{%=field.name%}">
                 {% for _, option in ipairs(field.options) do %}
-                    <option value="{%= option.value%}" {% if field.value == option.value then %}selected{% end%}>{%= option.label %}</option>
+                    <option value="{%= option.value%}" {% if tostring(field.value) == tostring(option.value) then %}selected{% end%}>{%= option.label %}</option>
                 {% end%}
               </select>
                 {% if field.has_errors == true then %}

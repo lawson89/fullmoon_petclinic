@@ -39,6 +39,7 @@ end
 local function showOwner(r)
     if r.params.id then
         local dbconn = pc:dbconn()
+        dbconn:query("select * from missing")
         local owner = assert(dbconn:queryOne("select * from owners where id=?", {r.params.id}))
         local pets = dbconn:query("select pets.id, pets.name, birth_date, types.name as type from pets, types where pets.type_id = types.id and pets.owner_id= ? order by      pets.name", {r.params.id})
         for _, pet in ipairs(pets) do
@@ -130,7 +131,6 @@ local function editPet(r)
     local owner = assert(dbconn:queryOne("select * from owners where id=?", {r.params.id}))
     local pet = assert(dbconn:queryOne("select * from pets where id=?", {r.params.pet_id}))
     form:bind(pet)
-    fm.logInfo(util.dump(form))
   else
     form:bind(r.params)
     form:validate(r.params)
@@ -153,17 +153,17 @@ local function newPet(r)
     
   if r.method == 'GET' then    
     local owner = assert(dbconn:queryOne("select * from owners where id=?", {r.params.id}))
-    return fm.serveContent("pets/createOrUpdatePetForm", {form=form, owner=owner})
   else
     form:bind(r.params)
     form:validate(r.params)
+    fm.logInfo(util.dump(form))
     if form.valid then
       assert(pc:dbconn():execute("insert into pets (name, birth_date, type_id, owner_id) values (?, ?, ?, ?)",
          {r.params.name, r.params.birth_date, r.params.type_id, r.params.id}))
       return fm.serveRedirect(303, "/owners/"..r.params.id)   
     end
-    return fm.serveContent("owners/createOrUpdatePetForm", {form=form})
   end
+  return fm.serveContent("pets/createOrUpdatePetForm", {form=form, owner=owner})
 end
 
 local function visitForm()
