@@ -1,6 +1,11 @@
 # fullmoon_petclinic
 Spring petclinic converted to redbean/fullmoon
 
+https://github.com/pkulchenko/fullmoon
+
+https://redbean.dev/
+
+
 To run clone this repo and run make start
 
 To run in daemon mode there is make start-daemon and make stop-daemon
