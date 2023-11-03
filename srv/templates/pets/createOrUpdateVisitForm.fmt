@@ -1,0 +1,52 @@
+{% function block.content() %}
+  <h2>
+    New 
+    Visit
+  </h2>
+
+  <b>Pet</b>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Birth Date</th>
+        <th>Type</th>
+        <th>Owner</th>
+      </tr>
+    </thead>
+    <tbody><tr>
+      <td>{%= pet.name %}</td>
+      <td>{%= pet.birth_date %}</td>
+      <td>hamster</td>
+      <td>{%= owner.first_name%} {%= owner.last_name%}</td>
+    </tr>
+  </tbody></table>
+  <form class="form-horizontal" method="post">
+     {% render('fragments/form', {form = form}) %}
+    
+    <div class="form-group">
+      <div class="col-sm-offset-2 col-sm-10">
+        <button class="btn btn-primary" type="submit">
+            Add Visit
+        </button>
+      </div>
+    </div>
+  </form>
+  <b>Previous Visits</b>
+  <table class="table table-striped">
+    <tbody>
+    <tr>
+      <th>Date</th>
+      <th>Description</th>
+    </tr>
+      {% for _, visit in ipairs(visits) do %}
+    <tr>
+      <td>{%=visit.date%}</td>
+      <td>{%= visit.description%}</td>
+    </tr>
+    {% end %}
+    
+  </tbody></table>
+{% end %}
+{% render('layout',  {active_menu='owners'}) %}
+

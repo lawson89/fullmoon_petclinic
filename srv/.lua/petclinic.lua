@@ -30,7 +30,6 @@ local function findOwners(r)
 
         fm.logInfo(string.format("Rows: %s", #owners))
 
-        -- the resulting rows are key-value pair with the column as the key
         return fm.serveContent("owners/ownersList", {owners = owners})
      else
        return fm.serveContent("owners/findOwners", {})
@@ -41,8 +40,13 @@ local function showOwner(r)
     if r.params.id then
         local dbconn = pc:dbconn()
         local owner = assert(dbconn:queryOne("select * from owners where id=?", {r.params.id}))
-        local pets = dbconn:query("select pets.id, pets.name, birth_date, types.name as type from pets, types where pets.type_id = types.id and pets.owner_id= ? order by      pets.name", {r.params.id}) or {}
-        
+        local pets = dbconn:query("select pets.id, pets.name, birth_date, types.name as type from pets, types where pets.type_id = types.id and pets.owner_id= ? order by      pets.name", {r.params.id})
+        for _, pet in ipairs(pets) do
+          local pet_id = pet.id
+          local visits = assert(dbconn:query("select * from visits, pets where visits.pet_id=pets.id and pet_id = ? order by visit_date", {pet_id}))
+          pet.visits = visits
+        end
+
         if owner then
           return fm.serveContent("owners/ownerDetails", {owner = owner, pets = pets}) 
         end
@@ -110,7 +114,7 @@ local function petForm()
     local form = Form:new({
     fields = {
         {name="name", label="Name", widget="text", validators = {{minlen=1, msg = "must not be empty"},{maxlen=64, msg="must be more than 64 characters"}}},
-        {name="birth_date", label="Birth Date", widget="date", validators = {{minlen=1, msg = "must not be empty"}}},
+        {name="birth_date", label="Birth Date", widget="date", validators = {{minlen=1, msg = "please select a date"}}},
         {name="type_id", label="Type", widget="select", options={}, validators = {}}}
     })
     return form
@@ -162,6 +166,38 @@ local function newPet(r)
   end
 end
 
+local function visitForm()
+    local form = Form:new({
+    fields = {
+        {name="visit_date", label="Visit Date", widget="date", validators = {{minlen=1, msg = "please choose a visit date"}}},
+        {name="description", label="Description", widget="text", validators = {{minlen=1, msg = "must not be empty"},{maxlen=64, msg="must be more than 256 characters"}}},
+        }
+    })
+    return form
+end
+
+local function newVisit(r)
+  local dbconn = pc:dbconn()
+  local form = visitForm()
+    
+    local owner = assert(dbconn:queryOne("select * from owners where id=?", {r.params.id}))
+    local visits = assert(dbconn:queryOne("select * from visits, pets where visits.id=pets.id and pet_id = ? order by visit_date", {r.params.pet_id}))
+    local pet = assert(dbconn:queryOne("select * from pets where id=?", {r.params.pet_id}))  
+    
+  if r.method == 'GET' then    
+    return fm.serveContent("pets/createOrUpdateVisitForm", {form=form, owner=owner, pet=pet, visits=visits})
+  else
+    form:bind(r.params)
+    form:validate(r.params)
+    if form.valid then
+      assert(pc:dbconn():execute("insert into pets (name, birth_date, type_id, owner_id) values (?, ?, ?, ?)",
+         {r.params.name, r.params.birth_date, r.params.type_id, r.params.id}))
+      return fm.serveRedirect(303, "/owners/"..r.params.id)   
+    end
+    return fm.serveContent("pets/createOrUpdateVisitForm", {form=form, owner=owner, pet=pet, visits=visits})
+  end
+end
+
 
 local function vetList(r)
   local dbconn = pc:dbconn()
@@ -176,6 +212,7 @@ fm.setRoute(fm.GET "/owners/:id[%d]", showOwner)
 fm.setRoute("/owners/:id[%d]/edit", editOwner)
 fm.setRoute("/owners/:id[%d]/pets/new", newPet)
 fm.setRoute("/owners/:id[%d]/pets/:pet_id[%d]/edit", editPet)
+fm.setRoute("/owners/:id[%d]/pets/:pet_id[%d]/visits/new", newVisit)
 fm.setRoute(fm.GET "/vets", vetList)
 fm.setRoute(fm.GET "/", welcome)
 fm.setRoute(fm.GET "/oops", showError)

@@ -47,19 +47,25 @@
               </dl>
             </td>
             <td valign="top">
-              <table class="table-condensed">
-                <thead>
-                  <tr>
-                    <th>Visit Date</th>
-                    <th>Description</th>
-                  </tr>
-                </thead>
-                
-                <tbody><tr>
+            <table class="table-condensed">
+            <thead>
+              <tr>
+                <th>Visit Date</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for _, visit in ipairs(pet.visits) do %}
+              <tr>
+                <td>{%=visit.visit_date%}&nbsp;</td>
+                <td>{%= visit.description%}</td>
+              </tr>
+              {% end %}
+            <tr>
                   <td><a href="{%=owner.id%}/pets/{%=pet.id%}/edit">Edit Pet</a></td>
                   <td><a href="{%=owner.id%}/pets/{%=pet.id%}/visits/new">Add Visit</a></td>
-                </tr>
-              </tbody></table>
+            </tr>
+          </tbody></table>            
             </td>
           </tr>
       {% end %}
