@@ -41,7 +41,7 @@
     </tr>
       {% for _, visit in ipairs(visits) do %}
     <tr>
-      <td>{%=visit.date%}</td>
+      <td>{%=visit.visit_date%}</td>
       <td>{%= visit.description%}</td>
     </tr>
     {% end %}

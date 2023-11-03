@@ -180,9 +180,9 @@ local function newVisit(r)
   local dbconn = pc:dbconn()
   local form = visitForm()
     
-    local owner = assert(dbconn:queryOne("select * from owners where id=?", {r.params.id}))
-    local visits = assert(dbconn:queryOne("select * from visits, pets where visits.id=pets.id and pet_id = ? order by visit_date", {r.params.pet_id}))
-    local pet = assert(dbconn:queryOne("select * from pets where id=?", {r.params.pet_id}))  
+  local owner = assert(dbconn:queryOne("select * from owners where id=?", {r.params.id}))
+  local pet = assert(dbconn:queryOne("select * from pets where id=?", {r.params.pet_id}))
+  local visits = assert(dbconn:query("select * from visits, pets where visits.pet_id=pets.id and pet_id = ? order by visit_date", {r.params.pet_id}))
     
   if r.method == 'GET' then    
     return fm.serveContent("pets/createOrUpdateVisitForm", {form=form, owner=owner, pet=pet, visits=visits})
@@ -190,8 +190,8 @@ local function newVisit(r)
     form:bind(r.params)
     form:validate(r.params)
     if form.valid then
-      assert(pc:dbconn():execute("insert into pets (name, birth_date, type_id, owner_id) values (?, ?, ?, ?)",
-         {r.params.name, r.params.birth_date, r.params.type_id, r.params.id}))
+      assert(pc:dbconn():execute("insert into visits (pet_id, visit_date, description) values (?, ?, ?)",
+         {r.params.pet_id, r.params.visit_date, r.params.description}))
       return fm.serveRedirect(303, "/owners/"..r.params.id)   
     end
     return fm.serveContent("pets/createOrUpdateVisitForm", {form=form, owner=owner, pet=pet, visits=visits})
