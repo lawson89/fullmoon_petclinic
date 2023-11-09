@@ -20,7 +20,7 @@ SQLITE3=sqlite3.com
 SQLITE3_DL=https://redbean.dev/sqlite3.com
 ZIP=zip
 ZIP_DL=https://redbean.dev/zip.com
-UNZIP=unzip.com
+UNZIP=unzip
 UNZIP_DL=https://redbean.dev/unzip.com
 DEFINITIONS=definitions/redbean.lua
 DEFINITIONS_DL=https://raw.githubusercontent.com/jart/cosmopolitan/2.2/tool/net/definitions.lua
@@ -47,8 +47,8 @@ ${ZIP}:
 	# chmod +x ${ZIP}
 
 ${UNZIP}:
-	curl -s ${UNZIP_DL} -o $@ -z $@
-	chmod +x ${UNZIP}
+	#curl -s ${UNZIP_DL} -o $@ -z $@
+	#chmod +x ${UNZIP}
 
 ${DEFINITIONS}:
 	mkdir -p definitions
@@ -73,6 +73,12 @@ start-daemon: ${REDBEAN}
 		./${REDBEAN} -vv -d -L ${PROJECT}.log -P ${PROJECT}.pid && \
 		printf "started $$(cat ${PROJECT}.pid)\n") \
 		|| echo "already running $$(cat ${PROJECT}.pid)"
+    
+start-daemon-silent: ${REDBEAN}
+	@(test ! -f ${PROJECT}.pid && \
+		./${REDBEAN} -s -d -P ${PROJECT}.pid && \
+		printf "started $$(cat ${PROJECT}.pid)\n") \
+		|| echo "already running $$(cat ${PROJECT}.pid)"    
 
 restart-daemon:
 	@(test ! -f ${PROJECT}.pid && \
@@ -85,6 +91,9 @@ stop-daemon: ${PROJECT}.pid
 	@kill -TERM $$(cat ${PROJECT}.pid) && \
 		printf "stopped $$(cat ${PROJECT}.pid)\n" && \
 		rm ${PROJECT}.pid \
+    
+benchmark:
+	wrk --latency -t 1000 -c 1000 --timeout 5s -H 'Accept-Encoding: gzip' http://127.0.0.1:8000/
 
 clean:
 	rm -f ${PROJECT}.log ${PROJECT}.pid ${REDBEAN} ${REDBEAN}.template ${SQLITE3} ${ZIP} ${UNZIP} ${DEFINITIONS}

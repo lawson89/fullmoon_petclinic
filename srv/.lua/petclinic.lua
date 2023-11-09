@@ -39,7 +39,6 @@ end
 local function showOwner(r)
     if r.params.id then
         local dbconn = pc:dbconn()
-        dbconn:query("select * from missing")
         local owner = assert(dbconn:queryOne("select * from owners where id=?", {r.params.id}))
         local pets = dbconn:query("select pets.id, pets.name, birth_date, types.name as type from pets, types where pets.type_id = types.id and pets.owner_id= ? order by      pets.name", {r.params.id})
         for _, pet in ipairs(pets) do
@@ -226,6 +225,7 @@ function pc.run(port)
 end
 
 local DBNAME = 'fullmoon_petclinic.db'
+--DBNAME = ':memory:'
 function pc:initDb()
     fm.logInfo("Initializing database")
     local dbm = fm.makeStorage(DBNAME)
