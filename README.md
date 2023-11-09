@@ -1,5 +1,5 @@
 # fullmoon_petclinic
-Spring petclinic converted to redbean/fullmoon
+Spring petclinic ported to redbean/fullmoon
 
 ## Motivation
 I became really interested in the redbean project and associated lua web farmework fullmoon.
@@ -25,6 +25,10 @@ Paul is also the author of ZeroBrane which is a wonderful Lua IDE that I used wh
 
 https://studio.zerobrane.com/
 
+## Benchmarks
+
+If interested in benchmarks please click [Benchmarks](BENCHMARKS.md)
+
 
 ## Instructions to run
 1. Clone repo
@@ -36,6 +40,10 @@ https://studio.zerobrane.com/
 ```
 make start
 ```
+
+Port defaults to 8000 and is sepecified at the bottom of petclinic.lua file
+
+Open http://localhost:8000
 
 ### Start as a background process
 ```
