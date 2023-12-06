@@ -13,7 +13,7 @@
           <span>{%= owner.first_name%} {%= owner.last_name%}</span>
         </div>
       </div>
-    {% end %}
+    {% end %} 
   <form class="form-horizontal" method="post">
      {% render('fragments/form', {form = form}) %}
     

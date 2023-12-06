@@ -10,6 +10,7 @@ local util = require "util"
 -- set template folder and extensions
 fm.setTemplate({ "/templates/", fmt = "fmt" })
 
+
 local pc = {}
 
 -- set routes and handlers
@@ -205,6 +206,7 @@ local function vetList(r)
 end        
 
 
+
 fm.setRoute("/owners/new", newOwner)
 fm.setRoute(fm.GET "/owners/find", findOwners)
 fm.setRoute(fm.GET "/owners/:id[%d]", showOwner)
@@ -220,12 +222,12 @@ fm.setRoute(fm.GET "/oops", showError)
 fm.setRoute("/*", "/assets/*")
 
 function pc.run(port)
-    -- start the app
+    -- start the app on port specified
     fm.run({ port = port or 8000 })
 end
 
 local DBNAME = 'fullmoon_petclinic.db'
---DBNAME = ':memory:'
+
 function pc:initDb()
     fm.logInfo("Initializing database")
     local dbm = fm.makeStorage(DBNAME)
