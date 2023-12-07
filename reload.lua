@@ -77,7 +77,9 @@ local function buildRedbean()
   local _, start_t = unix.clock_gettime()
   unix.unlink(REDBEAN)
   -- todo will need to detect if windows and modify commands
-  os.execute(string.format("cp -f %s %s", REDBEAN_TEMPLATE, REDBEAN) )
+  local template = Slurp(REDBEAN_TEMPLATE)
+  Barf(REDBEAN, template, 0700)
+  -- os.execute(string.format("cp -f %s %s", REDBEAN_TEMPLATE, REDBEAN) )
   os.execute(string.format("cd srv/ && ../%s -r ../%s .", ZIP, REDBEAN))
   print(string.format("Build took %.2f ms", nanoToMsElapsed(start_t)))
 end
@@ -122,7 +124,9 @@ else
 end
 while(true)
 do
+  local _, start_t = unix.clock_gettime()
   local dir_changed = snapshot_dir(DIRECTORY_TO_WATCH)
+  -- print(string.format("Directory scan took %.2f ms", nanoToMsElapsed(start_t)))
   if dir_changed then
     local status, retval = pcall(onChange)
     if not status then

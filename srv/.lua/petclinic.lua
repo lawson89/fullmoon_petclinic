@@ -10,7 +10,6 @@ local util = require "util"
 -- set template folder and extensions
 fm.setTemplate({ "/templates/", fmt = "fmt" })
 
-
 local pc = {}
 
 -- set routes and handlers
